@@ -7,3 +7,5 @@
 * Caso queira apenas testar: npm test 
 
 * Se quiser rodar a aplicação: npm start
+
+* Para testar o endpoint: [getWinners](http://localhost:5000/award/Golden Raspberry Awards/category/Worst Picture/winners)
