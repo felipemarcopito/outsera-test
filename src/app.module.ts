@@ -18,7 +18,7 @@ import {
 const DatabaseRootModule = TypeOrmModule.forRoot({
   type: 'sqlite',
   synchronize: true,
-  database: './outsera-test.sqlite',
+  database: ':memory:',
   autoLoadEntities:true
 });
 

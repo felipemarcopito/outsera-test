@@ -31,7 +31,6 @@ describe('AwardController', () => {
          .get(`/award/${config.goldenRaspberryAwards}/category/${config.worstPicture}/winners`);
 
       expect(response.status).toBe(200);
-
       expect(response.body).toMatchObject({
          min: expect.arrayContaining([
             expect.objectContaining({
@@ -50,5 +49,7 @@ describe('AwardController', () => {
             })
          ])
       });
+      expect(response.body.min).toHaveLength(2);
+      expect(response.body.max).toHaveLength(2);
    });
 });
