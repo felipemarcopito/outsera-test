@@ -8,4 +8,4 @@
 
 * Se quiser rodar a aplicação: npm start
 
-* Para testar o endpoint: [getWinners](http://localhost:5000/award/Golden Raspberry Awards/category/Worst Picture/winners)
+* Para testar o endpoint: [getWinners](http://localhost:5000/award/Golden%20Raspberry%20Awards/category/Worst%20Picture/winners)

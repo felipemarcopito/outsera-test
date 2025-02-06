@@ -62,18 +62,11 @@ export class AwardController {
             );
          });
          
-      const min = winners[0].interval;
-      const max = winners[winners.length - 1].interval;
-
       return {
          min: winners
-            .filter((winner) => {
-               return winner.interval === min;
-            }),
+            .slice(0, 2),
          max: winners
-            .filter((winner) => {
-               return winner.interval === max;
-            })
+            .slice(-2)
       };
    }
 }
