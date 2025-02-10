@@ -9,7 +9,8 @@ import {
    Controller,
    Get,
    NotFoundException,
-   Param
+   Param,
+   Query
 } from "@nestjs/common";
 
 @Controller('award')
@@ -23,7 +24,9 @@ export class AwardController {
    @Get(':awardId/category/:categoryId/winners')
    async getWinners(
       @Param('awardId') awardId: string,
-      @Param('categoryId') categoryId: string
+      @Param('categoryId') categoryId: string,
+      @Query('min') min: number = 1,
+      @Query('max') max: number = 22
    ) {
       const award = await this
          .awardService
@@ -51,7 +54,9 @@ export class AwardController {
          .awardService
          .getWinners(
             award.id as string, 
-            category.id as string
+            category.id as string,
+            min, 
+            max
          ))
          .map((winner) => {
             const dto = new AwardWinnerDTO();
