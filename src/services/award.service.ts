@@ -17,32 +17,40 @@ export class AwardService extends RepositoryService<Award> {
 
    async getWinners(
       awardId: string, 
-      categoryId: string
+      categoryId: string,
+      min: number,
+      max: number
    ) {
       const query = `
-         WITH Awards AS (
-            SELECT
-               p.id AS producer_id,
-               aw.year,
-               ROW_NUMBER() OVER (PARTITION BY p.id ORDER BY aw.year ASC) AS rank
-            FROM producer p
-            LEFT JOIN movie_producer mp ON p.id = mp.producerId
-            LEFT JOIN award_event_nominee aen ON mp.movieId = aen.movieId
-            LEFT JOIN award_event aw ON aen.eventId = aw.id
-            WHERE winner = true
-            AND awardId = '${awardId}'
-            AND categoryId = '${categoryId}'
+         with awards as (
+            select
+               award_event.year as year,
+               producer.name as producer,
+               producer.id as producer_id,
+               ROW_NUMBER() OVER (PARTITION BY producerId) AS rank
+            from award_event_nominee
+               left join movie on award_event_nominee.movieId = movie.id
+               left join movie_producer on movie.id = movie_producer.movieId
+               left join award_event on award_event_nominee.eventId = award_event.id
+               left join producer on movie_producer.producerId = producer.id
+            where 
+               winner = true
+               and award_event."awardId" = '${awardId}'
+               and award_event_nominee."categoryId" = '${categoryId}'
+            group by producerId, award_event.year
+            order by award_event.year
          )
-         SELECT
-            p.name AS producer,
-            MIN(ra.year) AS "previousWin",
-            (SELECT year FROM Awards WHERE producer_id = p.id AND rank = 2) AS "followingWin",
-            ((SELECT year FROM Awards WHERE producer_id = p.id AND rank = 2) - MIN(ra.year)) AS interval
-         FROM producer p
-         LEFT JOIN Awards ra ON p.id = ra.producer_id
-         GROUP BY p.name
-         HAVING followingWin IS NOT NULL
-         ORDER BY interval ASC;
+         select
+            previous.producer,
+            previous.year as "previousWin",
+            next.year as "followingWin",
+            next.year - previous.year as interval
+         from awards previous 
+            left join awards next on next.producer_id = previous.producer_id and next.rank = previous.rank + 1
+            where 
+               "followingWin" is not null
+               and (interval = ${min} or interval = ${max})
+            order by interval;
       `;
       
       return this.query(query) as Promise<AwardWinnerDTO[]>;
